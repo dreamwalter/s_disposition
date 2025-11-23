@@ -1,5 +1,5 @@
 # React for Rust + mysql + API
-<img src="./disposition.png" alt="運行界面" width="600">
+<img src="./disposition.png" alt="運行界面" width="480">
 
 ## data schema
 ```rust
