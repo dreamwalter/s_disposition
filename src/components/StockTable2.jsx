@@ -15,16 +15,6 @@ const StockTable = () => {
     direction: 'asc' // 'asc' 或 'desc'
   });
 
-  // 新增 Modal 狀態
-  const [modalVisible, setModalVisible] = useState(false);
-  const [formData, setFormData] = useState({
-    symbol: '',
-    name: '',
-    market: 'TSE',
-    stock_date: ''
-  });
-  const [submitting, setSubmitting] = useState(false);
-
   const API_BASE_URL = 'http://localhost:8888';
 
   const fetchStocks = async () => {
@@ -50,67 +40,6 @@ const StockTable = () => {
   useEffect(() => {
     fetchStocks();
   }, []);
-
-  // 新增處置股
-  const createDisposition = async (data) => {
-    try {
-      setSubmitting(true);
-      const response = await axios.post(`${API_BASE_URL}/disposition`, data);
-      
-      if (response.data.success) {
-        // 新增成功，刷新列表
-        await fetchStocks();
-        setModalVisible(false);
-        resetForm();
-        alert('新增處置股成功！');
-      } else {
-        alert(response.data.message || '新增失敗');
-      }
-    } catch (err) {
-      const errorMsg = err.response?.data?.message || err.message;
-      alert('新增失敗: ' + errorMsg);
-      console.error('Create Error:', err);
-    } finally {
-      setSubmitting(false);
-    }
-  };
-
-  // 重置表單
-  const resetForm = () => {
-    setFormData({
-      symbol: '',
-      name: '',
-      market: 'TSE',
-      stock_date: ''
-    });
-  };
-
-  // 處理表單輸入
-  const handleInputChange = (field, value) => {
-    setFormData(prev => ({
-      ...prev,
-      [field]: value
-    }));
-  };
-
-  // 處理表單提交
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    
-    // 基本驗證
-    if (!formData.symbol || !formData.name || !formData.market || !formData.stock_date) {
-      alert('請填寫必填欄位（股票代號、股票名稱、市場、處置日期）');
-      return;
-    }
-
-    // 驗證股票代號為數字
-    if (!/^\d+$/.test(formData.symbol)) {
-      alert('股票代號必須是數字');
-      return;
-    }
-
-    createDisposition(formData);
-  };
 
   // 排序功能
   const handleSort = (key) => {
@@ -304,14 +233,9 @@ const StockTable = () => {
               排序: {getColumnName(sortConfig.key)} ({sortConfig.direction === 'asc' ? '升序' : '降序'})
             </span>
           )}
-          <div className="button-group">
-            <button onClick={() => setModalVisible(true)} className="add-btn">
-              ➕ 新增
-            </button>
-            <button onClick={fetchStocks} className="refresh-btn">
-              🔄 刷新
-            </button>
-          </div>
+          <button onClick={fetchStocks} className="refresh-btn">
+            🔄 刷新
+          </button>
         </div>
       </div>
 
@@ -396,93 +320,6 @@ const StockTable = () => {
             )}
           </div>
           {renderPagination()}
-        </div>
-      )}
-
-      {/* 新增處置股 Modal */}
-      {modalVisible && (
-        <div className="modal-overlay">
-          <div className="modal">
-            <div className="modal-header">
-              <h3>新增處置股</h3>
-              <button 
-                className="close-btn"
-                onClick={() => {
-                  setModalVisible(false);
-                  resetForm();
-                }}
-              >
-                ×
-              </button>
-            </div>
-            
-            <form onSubmit={handleSubmit} className="modal-form">
-              <div className="form-group">
-                <label>股票代號 *</label>
-                <input
-                  type="text"
-                  value={formData.symbol}
-                  onChange={(e) => handleInputChange('symbol', e.target.value)}
-                  placeholder="請輸入股票代號"
-                  required
-                />
-              </div>
-
-              <div className="form-group">
-                <label>股票名稱 *</label>
-                <input
-                  type="text"
-                  value={formData.name}
-                  onChange={(e) => handleInputChange('name', e.target.value)}
-                  placeholder="請輸入股票名稱"
-                  required
-                />
-              </div>
-
-              <div className="form-group">
-                <label>市場 *</label>
-                <select
-                  value={formData.market}
-                  onChange={(e) => handleInputChange('market', e.target.value)}
-                  required
-                >
-                  <option value="TSE">上市</option>
-                  <option value="OTC">上櫃</option>
-                </select>
-              </div>
-
-              <div className="form-group">
-                <label>處置日期 *</label>
-                <input
-                  type="date"
-                  value={formData.stock_date}
-                  onChange={(e) => handleInputChange('stock_date', e.target.value)}
-                  required
-                />
-              </div>
-
-              <div className="modal-actions">
-                <button
-                  type="button"
-                  className="cancel-btn"
-                  onClick={() => {
-                    setModalVisible(false);
-                    resetForm();
-                  }}
-                  disabled={submitting}
-                >
-                  取消
-                </button>
-                <button
-                  type="submit"
-                  className="submit-btn"
-                  disabled={submitting}
-                >
-                  {submitting ? '新增中...' : '新增'}
-                </button>
-              </div>
-            </form>
-          </div>
         </div>
       )}
     </div>
