@@ -2,7 +2,7 @@
 ![運行界面](./disposition.png)
 
 ## data schema
-
+`
 pub struct Disposition {
     pub stock_date: Option<NaiveDate>,
     pub market: String,
@@ -13,3 +13,4 @@ pub struct Disposition {
     pub created_at: Option<NaiveDateTime>,
     pub updated_at: Option<NaiveDateTime>,
 }
+`
